@@ -22,6 +22,7 @@ from num2words import num2words
 import plotly.graph_objects as go
 from pathlib import Path
 from string import Template
+from precipy.analytics_function import AnalyticsFunction
 
 import observatory.reports.defaults as defaults
 

@@ -11,26 +11,16 @@
   },
   "analytics": [
     [
-      "get_data",
-      {
-      }
+      "fig_oa_global_trend",
+      {}
     ],
     [
-      "make_bq_table",
-      {
-      }
+      "fig_oa_country_compare",
+      {}
     ],
     [
-      "do_some_processing",
-      {
-        "depends": ["get_data", "make_bq_table"]
-      }
-    ],
-    [
-      "git_status",
-      {
-        "depends": ["get_data", "make_bq_table", "do_some_processing"]
-      }
+      "fig_oa_country_trend",
+      {}
     ]
   ],
   "templates": [
