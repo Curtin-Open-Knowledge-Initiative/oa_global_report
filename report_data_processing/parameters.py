@@ -27,7 +27,7 @@ GROUPS = GROUPS_NOT_FIELDS + ['Fields']
 METRICS = ['GiniSim', 'Shannon']
 
 # which data year to run. The final year is *not* included so for eg 2010 to 2019 use (2010, 2020)
-YEARS = list(range(2010, 2020))
+YEARS = list(range(2000, 2022))
 
 # measures of central location
 C_LOCS = ['mean', 'median']

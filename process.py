@@ -258,7 +258,8 @@ def fig_oa_global_trend(af: AnalyticsFunction):
     ), row=2, col=2)
 
     fig.update_layout(title=dict(text='<b>GLOBAL OPEN ACCESS LEVELS</b>'
-                                      '<br><sup> TREND OVER 21 YEARS FROM 2000 TO 2021 </sup>',
+                                      '<br><sup> TREND OVER ' + str(len(YEARS)) + ' YEARS FROM ' + str(min(YEARS))
+                                      + ' TO ' + str(max(YEARS)) + '</sup>',
                                  font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
                       font=dict(family="Arial, sans-serif", size=20)
                       )
@@ -293,13 +294,14 @@ def fig_oa_country_compare(af: AnalyticsFunction):
     df_agg['open_perc'] = df_agg.open / df_agg.total * 100
     df_oa_sort = df_agg.sort_values(by=['open_perc'], ascending=False)
     top10_low = df_oa_sort[df_oa_sort.total > 30].head(10)
-    top10_high = df_oa_sort[df_oa_sort.total > 210000].head(10)
+    top10_high = df_oa_sort[df_oa_sort.total > 10000*len(YEARS)].head(10)
 
     fig = make_subplots(rows=2, cols=2, row_heights=(0.01, 0.99), horizontal_spacing=0.12, vertical_spacing=0.16,
                         subplot_titles=["", "",
                                         "Countries with more than 30 outputs overall",
                                         "Countries averaging more than 10,000 outputs per year"]
                         )
+
     # countries with more than 30 outputs
     fig.add_trace(go.Bar(x=top10_low.index.values, y=top10_low.publisher_only / top10_low.total * 100,
                          marker_color='#ffd700', name='PUBLISHER OPEN', showlegend=False),
@@ -310,6 +312,7 @@ def fig_oa_country_compare(af: AnalyticsFunction):
     fig.add_trace(go.Bar(x=top10_low.index.values, y=top10_low.other_platform_only / top10_low.total * 100,
                          marker_color='#9FD27E', name='OTHER PLATFORM OPEN', showlegend=False),
                   row=2, col=1)
+
     # countries with more than 210,000 outputs
     fig.add_trace(go.Bar(x=top10_high.index.values, y=top10_high.publisher_only / top10_high.total * 100,
                          marker_color='#ffd700', name='PUBLISHER OPEN', showlegend=True),
@@ -322,7 +325,8 @@ def fig_oa_country_compare(af: AnalyticsFunction):
                   row=2, col=2)
 
     fig.update_layout(title=dict(text='<b>TOP 10 COUNTRIES BY OPEN ACCESS LEVELS</b>'
-                                      '<br><sup>DATA OVER 21 YEARS FROM 2011 TO 2020 </sup>',
+                                      '<br><sup> DATA OVER ' + str(len(YEARS)) + ' YEARS FROM ' + str(min(YEARS))
+                                      + ' TO ' + str(max(YEARS)) + '</sup>',
                                  font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
                       yaxis3_title="Open access level (%)",
                       yaxis4_title="Open access level (%)",
@@ -357,18 +361,16 @@ def fig_oa_country_trend(af: AnalyticsFunction):
     # calculate total outputs and open access percentages, notes year begin and year end
     df['total'] = df.open + df.closed
     df['open_perc'] = df.open / df.total * 100
-    year_min = min(df.year)
-    year_max = max(df.year)
 
     # filter list of countries by total outputs - one for > 30 and one for >210000
     df_agg = df.groupby(['name']).agg('sum')
     df_agg['total'] = df_agg.open + df_agg.closed
     country_list_low = df_agg[df_agg.total > 30].index.values
-    country_list_high = df_agg[df_agg.total > 210000].index.values
+    country_list_high = df_agg[df_agg.total > 10000*len(YEARS)].index.values
 
-    # find top 10 countries in terms of change in % open access for both list
-    df_start = df[df.year == year_min][['name', 'open_perc']]
-    df_end = df[df.year == year_max][['name', 'open_perc']]
+    # find top 10 countries in terms of change in % open access for both lists
+    df_start = df[df.year == min(YEARS)][['name', 'open_perc']]
+    df_end = df[df.year == max(YEARS)][['name', 'open_perc']]
     df_diff = df_start.merge(df_end, on=['name'], suffixes=('_start', '_end'))
     df_diff['open_perc_diff'] = df_diff.open_perc_end - df_diff.open_perc_start
     top10_low = df_diff[df_diff.name.isin(country_list_low)]
@@ -376,45 +378,49 @@ def fig_oa_country_trend(af: AnalyticsFunction):
     top10_high = df_diff[df_diff.name.isin(country_list_high)]
     top10_high = top10_high.sort_values(by=['open_perc_diff'], ascending=False).head(10).name
 
-    fig = make_subplots(rows=2, cols=1, vertical_spacing=0.2,
-                        subplot_titles=["Countries with more than 30 outputs overall",
-                                        "Countries averaging more than 10,000 outputs per year"],
-                        shared_yaxes='all'
-                        )
+    # plot and save figure for top movers in countries with more than 30 outputs
+    fig = make_subplots(rows=1, cols=1)
     for country in top10_low:
         df_fig = df[df.name == country].sort_values(by='year')
         fig.add_trace(go.Scatter(x=df_fig.year,
                                  y=df_fig.open_perc,
                                  name=country,
                                  legendgroup='1'), row=1, col=1)
+    fig.update_layout(xaxis_type='category')
+    fig.update_xaxes(categoryorder='category ascending')
+    fig.update_layout(title=dict(text='<b>TOP 10 BIGGEST MOVERS IN OPEN ACCESS LEVELS</b>'
+                                      '<br><sup>COUNTRIES WITH MORE THAN 30 OUTPUTS OVERALL </sup>',
+                                 font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
+                      yaxis_title="Open access level (%)",
+                      font=dict(family="Arial, sans-serif", size=20))
+    fig.update_xaxes(title_text="Year", row=1, col=1)
+    fig.update_xaxes(tickangle=270)
+    if not os.path.exists('report_graphs'):
+        os.makedirs('report_graphs')
+    fig.write_image('report_graphs/oa_country_trend_low.png', scale=FIG_SCALE, width=1500, height=600)
+    af.add_existing_file('report_graphs/oa_country_trend_low.png')
 
+    # plot and save figure for top movers in countries with more than 10,000 outputs per year
+    fig = make_subplots(rows=1, cols=1)
     for country in top10_high:
         df_fig = df[df.name == country].sort_values(by='year')
         fig.add_trace(go.Scatter(x=df_fig.year,
                                  y=df_fig.open_perc,
                                  name=country,
-                                 legendgroup='2'), row=2, col=1)
-
+                                 legendgroup='2'), row=1, col=1)
     fig.update_layout(xaxis_type='category')
-    fig.update_layout(xaxis2_type='category')
     fig.update_xaxes(categoryorder='category ascending')
-    fig.update_layout(legend_tracegroupgap=70)
-
     fig.update_layout(title=dict(text='<b>TOP 10 BIGGEST MOVERS IN OPEN ACCESS LEVELS</b>'
-                                      '<br><sup>TREND OVER 21 YEARS FROM 2011 TO 2020 </sup>',
+                                      '<br><sup>COUNTRIES AVERAGING MORE THAN 10,000 OUTPUTS PER YEAR </sup>',
                                  font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
                       yaxis_title="Open access level (%)",
-                      yaxis2_title="Open access level (%)",
-                      barmode='stack',
                       font=dict(family="Arial, sans-serif", size=20))
     fig.update_xaxes(title_text="Year", row=1, col=1)
-    fig.update_xaxes(title_text="Year", row=2, col=1)
     fig.update_xaxes(tickangle=270)
-
     if not os.path.exists('report_graphs'):
         os.makedirs('report_graphs')
-    fig.write_image('report_graphs/oa_country_trend.png', scale=FIG_SCALE, width=1500, height=900)
-    af.add_existing_file('report_graphs/oa_country_trend.png')
+    fig.write_image('report_graphs/oa_country_trend_high.png', scale=FIG_SCALE, width=1500, height=600)
+    af.add_existing_file('report_graphs/oa_country_trend_high.png')
 
     print('... completed')
 
