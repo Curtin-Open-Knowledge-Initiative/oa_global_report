@@ -16,23 +16,16 @@
 #
 # Authors: COKI Team
 import json
-from pathlib import Path
 import os
-import copy
 
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 from plotly.subplots import make_subplots
-import plotly.figure_factory as ff
-from typing import Optional, Callable, Union
+from git import Repo
 
-from google.cloud import bigquery
-
-from observatory.reports import report_utils, provndoc_utils
+from observatory.reports import provndoc_utils
 from precipy.analytics_function import AnalyticsFunction
-from report_data_processing.parameters import *
+from parameters import *
 from report_data_processing.sql import *
 
 # Insert applicable graphs once created
@@ -92,59 +85,6 @@ def run_all_queries(af: AnalyticsFunction,
             df = pd.read_gbq(query,
                              project_id=PROJECT_ID)
             df.to_csv(DATA_FOLDER / f'{sql_file.stem}.csv')
-
-
-def get_data(af: AnalyticsFunction,
-             rerun: bool = False,
-             verbose: bool = True):
-    """
-    Template function for downloading data from BigQuery
-
-    Change 'query', 'project_id' and output filenames
-    """
-
-    if verbose:
-        print(f'Running {af.function_name}...')
-    if not rerun:
-        if verbose:
-            print(f'...not running query, rerun: {rerun}')
-        return
-
-    hello_world_query = pd.read_gbq(query=hello_world,
-                                    project_id=PROJECT_ID)
-
-    hello_world_query.to_csv('hello_world.csv')
-    af.add_existing_file('hello_world.csv')
-    if verbose:
-        print('...completed')
-
-
-def make_bq_table(af: AnalyticsFunction,
-                  rerun: bool = False,
-                  verbose: bool = True):
-    """
-    Template function for running a query remotely and saving the new table in BigQuery
-    """
-
-    if verbose:
-        print(f'Running {af.function_name}...')
-    if not rerun:
-        if verbose:
-            print(f'...not running query, rerun: {rerun}')
-        return
-
-    print('Generating the ROC DOI Table')
-    with bigquery.Client() as client:
-        job_config = bigquery.QueryJobConfig(destination=DESTINATION_TABLE,
-                                             create_disposition='CREATE_IF_NEEDED',
-                                             write_disposition='WRITE_TRUNCATE')
-
-        # Start the query, passing in the extra configuration.
-        query_job = client.query(QUERY, job_config=job_config)  # Make an API request.
-        query_job.result()  # Wait for the job to complete.
-
-    if verbose:
-        print('...completed')
 
 
 def git_status(af: AnalyticsFunction):
@@ -425,6 +365,24 @@ def fig_oa_country_trend(af: AnalyticsFunction):
     print('... completed')
 
 
+def git_status(af: AnalyticsFunction):
+    """
+    Record Git Status for Current State of the Repo
+    """
 
+    repo = Repo(search_parent_directories=True)
+    print('This report was run from the git commit hash: ' + repo.head.object.hexsha)
+    changedfiles = [item.a_path for item in repo.index.diff(None)]
+    if len(changedfiles > 0):
+        print('WARNING: This report was run with local changes that were not committed to the following files: ')
+        print(changedfiles)
+
+    for f in af.generate_file('git_status.json'):
+        json.dump(dict(
+            sha=repo.head.object.hexsha,
+            changedfiles=[item.a_path for item in repo.index.diff(None)],
+            branch=repo.active_branch.name),
+            f
+        )
 
 

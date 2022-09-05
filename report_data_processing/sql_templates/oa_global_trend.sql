@@ -1,14 +1,16 @@
 SELECT
   crossref.published_year AS year,
   COUNT(doi) AS total,
-  COUNTIF(coki.oa_coki.open IS true) AS open,
-  COUNTIF(coki.oa_coki.closed IS true) AS closed,
-  COUNTIF(coki.oa_coki.publisher IS true) AS publisher,
-  COUNTIF(coki.oa_coki.other_platform IS true) AS other_platform,
-  COUNTIF(coki.oa_coki.publisher_only IS true) AS publisher_only,
-  COUNTIF(coki.oa_coki.both IS true) AS both,
-  COUNTIF(coki.oa_coki.other_platform_only IS true) AS other_platform_only
-FROM `academic-observatory.observatory.doi20220827`
-WHERE crossref.published_year>1999 AND crossref.published_year<2022 AND coki.oa_coki IS NOT NULL
+  COUNTIF(unpaywall.is_oa IS true) AS open,
+  COUNTIF(unpaywall.is_oa IS false) AS closed,
+  COUNTIF((unpaywall.gold IS true) OR (unpaywall.bronze IS TRUE)) AS publisher,
+  COUNTIF(unpaywall.green IS true) AS other_platform,
+  COUNTIF(((unpaywall.gold IS true) OR (unpaywall.bronze IS TRUE))
+              AND (unpaywall.green IS FALSE)) AS publisher_only,
+  COUNTIF(((unpaywall.gold IS true) OR (unpaywall.bronze IS TRUE))
+              AND (unpaywall.green IS TRUE)) AS both,
+  COUNTIF(unpaywall.green_only_ignoring_bronze IS true) AS other_platform_only
+FROM `{doi_table}`
+WHERE crossref.published_year>1999 AND crossref.published_year<2022 AND unpaywall.is_oa IS NOT NULL
 GROUP BY year
 ORDER BY year
