@@ -2,7 +2,7 @@
 {% include "report_css.html" %}
 
 {% set report_numbers = load_json(report_numbers.files["report_numbers.json"].cache_filepath) %}
-{% set git_status = load_json(git_status.fules["git_status.json"].cache_filepath) %}
+{% set git_status = load_json(git_status.files["git_status.json"].cache_filepath) %}
 
 <!-- Title Page -->
 <pdf:nexttemplate name="titlepage">
@@ -54,7 +54,7 @@ This report was generated automatically from the source data and the relevant co
 is available at {{ git_status.remote_url }} with the commit hash {{ git_status.sha }} on branch {{ git_status.branch }}.
 
 The primary data table used was the final DOI table in the Academic Observatory for 
-{{ report_numbers.census_year.year }}, {{ parameters.doi_table }}. Open Access types and the means for
+{{ report_numbers.census_year.year }}, ###parameters.doi_table###. Open Access types and the means for
 detecting them are as described on the [COKI Open Access Dashboard](https://open.coki.ac/how/).
 
 

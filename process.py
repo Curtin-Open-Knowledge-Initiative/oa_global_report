@@ -36,8 +36,6 @@ from report_data_processing.sql import *
 # )
 
 # Replace with applicable project name
-PROJECT_ID = 'coki-oa_global_report'
-
 
 def process_sql_templates_to_queries(af: AnalyticsFunction,
                                      rerun: bool = RERUN):
@@ -55,7 +53,7 @@ def provenance_n_documentation(af: AnalyticsFunction,
 
 
 def run_all_queries(af: AnalyticsFunction,
-                    rerun: bool = False,
+                    rerun: bool = RERUN,
                     verbose: bool = VERBOSE):
     sql_files = sorted(Path(SQL_PROCESSED_DIRECTORY).glob('*.sql'))
     provdag = provndoc_utils.dag_from_pickle(DAG_FILEPATH)
@@ -112,14 +110,14 @@ def report_numbers(af: AnalyticsFunction):
     census_year = dict(
         year=CENSUS_YEAR)
     census_year.update(
-        {f'pc_{oa_type}': oa_global.loc[CENSUS_YEAR, f'pc_{oa_type}'] for oa_type in OA_TYPES}
+        {f'pc_{oa_type}': oa_global[oa_global.year==CENSUS_YEAR][f'pc_{oa_type}'].values[0] for oa_type in OA_TYPES}
     )
     census_year.update(
-        {f'pc_{oa_type}': oa_global.loc[CENSUS_YEAR, f'pc_{oa_type}_increase'] for oa_type in OA_TYPES}
+        {f'pc_{oa_type}_increase': oa_global[oa_global.year==CENSUS_YEAR][f'pc_{oa_type}_increase'].values[0] for oa_type in OA_TYPES}
     )
 
-    zero_embargo_census_year = np.round(((zero_embargo.loc[CENSUS_YEAR, 'count_zero_embargo'] /
-                                          oa_global.loc[CENSUS_YEAR, 'other_platform']) * 100), 0)
+    zero_embargo_census_year = np.round(((zero_embargo[zero_embargo.year==CENSUS_YEAR]['count_zero_embargo'].values[0]/
+                                          oa_global[oa_global.year==CENSUS_YEAR]['other_platform'].values[0]) * 100), 0)
     census_year.update(dict(pc_other_platform_zero_embargo=zero_embargo_census_year))
 
     report_numbers_dict = dict(
@@ -128,7 +126,7 @@ def report_numbers(af: AnalyticsFunction):
         report_year=REPORT_YEAR
     )
 
-    with af.generate_file(REPORT_DATA_FILEPATH, 'w') as f:
+    for f in af.generate_file(REPORT_DATA_FILENAME):
         json.dump(report_numbers_dict, f)
 
 
@@ -397,7 +395,7 @@ def git_status(af: AnalyticsFunction):
     repo = Repo(search_parent_directories=True)
     print('This report was run from the git commit hash: ' + repo.head.object.hexsha)
     changedfiles = [item.a_path for item in repo.index.diff(None)]
-    if len(changedfiles > 0):
+    if len(changedfiles) > 0:
         print('WARNING: This report was run with local changes that were not committed to the following files: ')
         print(changedfiles)
 
@@ -407,6 +405,6 @@ def git_status(af: AnalyticsFunction):
             changedfiles=[item.a_path for item in repo.index.diff(None)],
             branch=repo.active_branch.name,
             remotes=', '.join([remote.name for remote in repo.remotes]),
-            remote_url=';'.join([remote.urls for remote in repo.remotes[0]])),
+            remote_url=';'.join(remote.url for remote in repo.remotes)),
             f
         )

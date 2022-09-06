@@ -19,13 +19,6 @@
 # Utility functions
 from pathlib import Path
 
-# which groupings to run
-GROUPS_NOT_FIELDS = ['Institutions', 'Countries', 'Subregions', 'Regions']
-GROUPS = GROUPS_NOT_FIELDS + ['Fields']
-
-# which citation diversity metric to run
-METRICS = ['GiniSim', 'Shannon']
-
 # which data year to run. The final year is *not* included so for eg 2010 to 2019 use (2010, 2020)
 YEARS = range(2010, 2022)
 REPORT_YEAR = 2020
@@ -45,23 +38,14 @@ OA_TYPES = [
 C_LOCS = ['mean', 'median']
 
 # Table Locations
-RERUN = False
+RERUN = True
 VERBOSE = True
 PROJECT_ID = 'coki-scratch-space'
-DOI_TABLE = 'academic-observatory.observatory.doi20220730'
-MAG_REFERENCES_TABLE = 'academic-observatory.mag.PaperReferences20211206'
-CITATION_DIVERSITY_TABLE = 'coki-scratch-space.citation_diversity_analysis.citation_diversity_global'
+DOI_TABLE = 'academic-observatory.observatory.doi20201212'
+UNPAYWALL_TABLE = 'academic-observatory.our_research.unpaywall'
 
 DESTINATION_TABLES = {
-    'global_citation_query.sql': CITATION_DIVERSITY_TABLE
 }
-
-SQL_TEMPLATE_PARAMETERS = dict(
-    years=YEARS,
-    first_year=YEARS[0],
-    last_year=YEARS[-1],
-    doi_table=DOI_TABLE,
-)
 
 # File Locations
 DATA_FOLDER = Path('tempdata')
@@ -69,6 +53,14 @@ DAG_FILENAME = 'dag.pkl'
 DAG_FILEPATH = DATA_FOLDER / DAG_FILENAME
 REPORT_DATA_FILENAME = 'report_numbers.json'
 REPORT_DATA_FILEPATH = DATA_FOLDER / REPORT_DATA_FILENAME
+
+SQL_TEMPLATE_PARAMETERS = dict(
+    years=YEARS,
+    start_year=YEARS[0],
+    end_year=YEARS[-1],
+    doi_table=DOI_TABLE,
+    unpaywall=UNPAYWALL_TABLE
+)
 
 # color mapping when comparing regions
 COLOR_MAP_REGIONS = {

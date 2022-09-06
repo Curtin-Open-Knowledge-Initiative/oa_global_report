@@ -1,3 +1,19 @@
+/*
+## Summary
+Identifies Zero Embargo Other-platform open
+
+## Description
+
+## Contacts
+cameron.neylon@curtin.edu.au
+
+## Requires
+table bigquery://{unpaywall}
+
+## Creates
+file zero_embargo.csv
+*/
+
 WITH first_repo AS (
     SELECT
      doi,

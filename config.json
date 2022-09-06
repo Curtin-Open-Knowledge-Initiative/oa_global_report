@@ -11,15 +11,39 @@
   },
   "analytics": [
     [
-      "fig_oa_global_trend",
+      "process_sql_templates_to_queries",
       {}
+    ],
+    [
+      "provenance_n_documentation",
+      {
+        "depends": ["process_sql_templates_to_queries"]
+      }
+    ],
+    [
+      "run_all_queries",
+      {
+        "depends": ["provenance_n_documentation"]
+      }
+    ],
+    [
+      "report_numbers",
+      {"depends": ["run_all_queries"]}
+    ],
+    [
+      "fig_oa_global_trend",
+      {"depends": ["run_all_queries"]}
     ],
     [
       "fig_oa_country_compare",
-      {}
+      {"depends": ["run_all_queries"]}
     ],
     [
       "fig_oa_country_trend",
+      {"depends": ["run_all_queries"]}
+    ],
+    [
+      "git_status",
       {}
     ]
   ],
