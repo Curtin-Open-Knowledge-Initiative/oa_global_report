@@ -1,3 +1,20 @@
+/*
+## Summary
+Calculates overall OA figures by country
+
+## Description
+Using the DOI table in Academic Observatory calculate various OA parameters by publication year and country
+
+## Contacts
+cameron.neylon@curtin.edu.au
+
+## Requires
+table bigquery://{doi_table}
+
+## Creates
+file oa_country_trend.csv
+*/
+
 SELECT
   crossref.published_year AS year,
   c.name as name,

@@ -1,8 +1,28 @@
-WITH embargos AS (
+WITH first_repo AS (
     SELECT
-        (SELECT oa_locations.oa_date FROM UNNEST(oa_locations) WHERE oa_locations.type = "repository")
-    FROM `{unpaywall}`
-    WHERE year = {census_year}
-)
+     doi,
+     year,
+     published_date,
+     (
+        SELECT g.oa_date
+        FROM UNNEST(u.oa_locations) as g
+        WHERE ((g.host_type = "repository") and (g.version IN ('publishedVersion', 'acceptedVersion')) and
+            (g.oa_date is not null))
+        ORDER BY g.oa_date ASC
+        LIMIT 1
+         ) as first_repo_date
+    FROM `{unpaywall}` as u
+    WHERE year > 2015
+    ),
+  embargos AS (
+  SELECT
+    doi,
+    year,
+    DATE_DIFF(published_date, first_repo_date, MONTH) as embargo
+  FROM first_repo
+    )
 SELECT
-    DATE(published_date)
+    year,
+    COUNT(DISTINCT IF(embargo < 1, doi, null)) as count_zero_embargo,
+    COUNT(DISTINCT IF(embargo < 3, doi, null)) as count_zeroish
+FROM embargos GROUP BY year ORDER BY year ASC

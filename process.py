@@ -19,6 +19,7 @@ import json
 import os
 
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from git import Repo
@@ -36,12 +37,10 @@ from report_data_processing.sql import *
 
 # Replace with applicable project name
 PROJECT_ID = 'coki-oa_global_report'
-TEMPDIR = Path('tempdir')
 
 
 def process_sql_templates_to_queries(af: AnalyticsFunction,
-                                     rerun: bool=RERUN):
-
+                                     rerun: bool = RERUN):
     provndoc_utils.process_sql_to_queries(af,
                                           SQL_TEMPLATE_PARAMETERS,
                                           rerun,
@@ -51,7 +50,6 @@ def process_sql_templates_to_queries(af: AnalyticsFunction,
 
 def provenance_n_documentation(af: AnalyticsFunction,
                                rerun: bool = RERUN):
-
     dag = provndoc_utils.build_sql_dag(SQL_PROCESSED_DIRECTORY)
     dag.to_pickle(DAG_FILEPATH)
 
@@ -59,11 +57,10 @@ def provenance_n_documentation(af: AnalyticsFunction,
 def run_all_queries(af: AnalyticsFunction,
                     rerun: bool = False,
                     verbose: bool = VERBOSE):
-
     sql_files = sorted(Path(SQL_PROCESSED_DIRECTORY).glob('*.sql'))
     provdag = provndoc_utils.dag_from_pickle(DAG_FILEPATH)
     sorted_nodes = ['_'.join(nodename.split('_')[1:]) for nodename in provdag.topologicalSort()]
-    filelist =[Path(node) for node in sorted_nodes if node in [str(f) for f in sql_files]]
+    filelist = [Path(node) for node in sorted_nodes if node in [str(f) for f in sql_files]]
 
     for sql_file in filelist:
         query = load_sql_to_string(sql_file)
@@ -87,25 +84,52 @@ def run_all_queries(af: AnalyticsFunction,
             df.to_csv(DATA_FOLDER / f'{sql_file.stem}.csv')
 
 
-def git_status(af: AnalyticsFunction):
+def report_numbers(af: AnalyticsFunction):
     """
-    Record Git Status for Current State of the Repo
+    Generate the numbers for insertion into the report
+
+    ## Requires
+    file oa_global_trend.csv
+    file oa_country_trend.csv
+    file zero_embargo.csv
+    file parameters.py
+
+    ## Creates
+    file report_numbers.json
     """
 
-    repo = Repo(search_parent_directories=True)
-    print('This report was run from the git commit hash: ' + repo.head.object.hexsha)
-    changedfiles = [item.a_path for item in repo.index.diff(None)]
-    if len(changedfiles > 0):
-        print('WARNING: This report was run with local changes that were not committed to the following files: ')
-        print(changedfiles)
+    oa_global = pd.read_csv(DATA_FOLDER / 'oa_global_trend.csv')
+    oa_global.sort_values('year', ascending=False, inplace=True)
+    oa_country = pd.read_csv(DATA_FOLDER / 'oa_country_trend.csv')
+    zero_embargo = pd.read_csv(DATA_FOLDER / 'zero_embargo.csv')
 
-    for f in af.generate_file('git_status.json'):
-        json.dump(dict(
-            sha=repo.head.object.hexsha,
-            changedfiles=[item.a_path for item in repo.index.diff(None)],
-            branch=repo.active_branch.name),
-            f
-        )
+    for oa_type in OA_TYPES:
+        for df in [oa_global, oa_country]:
+            df[f'pc_{oa_type}'] = np.round((df[oa_type] / df['total'] * 100), 0)
+
+        oa_global[f'pc_{oa_type}_increase'] = oa_global[oa_type].diff(periods=-1)
+
+    census_year = dict(
+        year=CENSUS_YEAR)
+    census_year.update(
+        {f'pc_{oa_type}': oa_global.loc[CENSUS_YEAR, f'pc_{oa_type}'] for oa_type in OA_TYPES}
+    )
+    census_year.update(
+        {f'pc_{oa_type}': oa_global.loc[CENSUS_YEAR, f'pc_{oa_type}_increase'] for oa_type in OA_TYPES}
+    )
+
+    zero_embargo_census_year = np.round(((zero_embargo.loc[CENSUS_YEAR, 'count_zero_embargo'] /
+                                          oa_global.loc[CENSUS_YEAR, 'other_platform']) * 100), 0)
+    census_year.update(dict(pc_other_platform_zero_embargo=zero_embargo_census_year))
+
+    report_numbers_dict = dict(
+        census_year=census_year,
+        comparison_year=dict(year=CENSUS_YEAR - 1),
+        report_year=REPORT_YEAR
+    )
+
+    with af.generate_file(REPORT_DATA_FILEPATH, 'w') as f:
+        json.dump(report_numbers_dict, f)
 
 
 def fig_oa_global_trend(af: AnalyticsFunction):
@@ -234,7 +258,7 @@ def fig_oa_country_compare(af: AnalyticsFunction):
     df_agg['open_perc'] = df_agg.open / df_agg.total * 100
     df_oa_sort = df_agg.sort_values(by=['open_perc'], ascending=False)
     top10_low = df_oa_sort[df_oa_sort.total > 30].head(10)
-    top10_high = df_oa_sort[df_oa_sort.total > 10000*len(YEARS)].head(10)
+    top10_high = df_oa_sort[df_oa_sort.total > 10000 * len(YEARS)].head(10)
 
     fig = make_subplots(rows=2, cols=2, row_heights=(0.01, 0.99), horizontal_spacing=0.12, vertical_spacing=0.16,
                         subplot_titles=["", "",
@@ -306,7 +330,7 @@ def fig_oa_country_trend(af: AnalyticsFunction):
     df_agg = df.groupby(['name']).agg('sum')
     df_agg['total'] = df_agg.open + df_agg.closed
     country_list_low = df_agg[df_agg.total > 30].index.values
-    country_list_high = df_agg[df_agg.total > 10000*len(YEARS)].index.values
+    country_list_high = df_agg[df_agg.total > 10000 * len(YEARS)].index.values
 
     # find top 10 countries in terms of change in % open access for both lists
     df_start = df[df.year == min(YEARS)][['name', 'open_perc']]
@@ -381,8 +405,8 @@ def git_status(af: AnalyticsFunction):
         json.dump(dict(
             sha=repo.head.object.hexsha,
             changedfiles=[item.a_path for item in repo.index.diff(None)],
-            branch=repo.active_branch.name),
+            branch=repo.active_branch.name,
+            remotes=', '.join([remote.name for remote in repo.remotes]),
+            remote_url=';'.join([remote.urls for remote in repo.remotes[0]])),
             f
         )
-
-

@@ -27,8 +27,20 @@ GROUPS = GROUPS_NOT_FIELDS + ['Fields']
 METRICS = ['GiniSim', 'Shannon']
 
 # which data year to run. The final year is *not* included so for eg 2010 to 2019 use (2010, 2020)
-YEARS = list(range(2000, 2022))
+YEARS = range(2010, 2022)
+REPORT_YEAR = 2020
+CENSUS_YEAR = 2019
 
+# oa types
+OA_TYPES = [
+    'open',
+    'closed',
+    'publisher',
+    'other_platform',
+    'both',
+    'other_platform_only',
+    'publisher_only'
+]
 # measures of central location
 C_LOCS = ['mean', 'median']
 
@@ -49,14 +61,14 @@ SQL_TEMPLATE_PARAMETERS = dict(
     first_year=YEARS[0],
     last_year=YEARS[-1],
     doi_table=DOI_TABLE,
-    mag_references_table=MAG_REFERENCES_TABLE,
-    citation_diversity_table=CITATION_DIVERSITY_TABLE
 )
 
 # File Locations
 DATA_FOLDER = Path('tempdata')
 DAG_FILENAME = 'dag.pkl'
 DAG_FILEPATH = DATA_FOLDER / DAG_FILENAME
+REPORT_DATA_FILENAME = 'report_numbers.json'
+REPORT_DATA_FILEPATH = DATA_FOLDER / REPORT_DATA_FILENAME
 
 # color mapping when comparing regions
 COLOR_MAP_REGIONS = {
