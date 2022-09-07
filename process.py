@@ -226,8 +226,8 @@ def fig_oa_global_trend(af: AnalyticsFunction):
     ), row=2, col=2)
 
     fig.update_layout(title=dict(text='<b>GLOBAL OPEN ACCESS LEVELS</b>'
-                                      '<br><sup> TREND OVER ' + str(len(YEARS)) + ' YEARS FROM ' + str(min(YEARS))
-                                      + ' TO ' + str(max(YEARS)) + '</sup>',
+                                      '<br><sup> TREND OVER ' + str(len(YEARS) - 1) + ' YEARS FROM ' + str(min(YEARS))
+                                      + ' TO ' + str(CENSUS_YEAR) + '</sup>',
                                  font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
                       font=dict(family="Arial, sans-serif", size=20)
                       )
@@ -294,8 +294,8 @@ def fig_oa_country_compare(af: AnalyticsFunction):
                   row=2, col=2)
 
     fig.update_layout(title=dict(text='<b>TOP 10 COUNTRIES BY OPEN ACCESS LEVELS</b>'
-                                      '<br><sup> DATA OVER ' + str(len(YEARS)) + ' YEARS FROM ' + str(min(YEARS))
-                                      + ' TO ' + str(max(YEARS)) + '</sup>',
+                                      '<br><sup> DATA OVER ' + str(len(YEARS) - 1) + ' YEARS FROM ' + str(min(YEARS))
+                                      + ' TO ' + str(CENSUS_YEAR) + '</sup>',
                                  font=dict(family="Arial, sans-serif", size=35, color="darkorange")),
                       yaxis3_title="Open access level (%)",
                       yaxis4_title="Open access level (%)",

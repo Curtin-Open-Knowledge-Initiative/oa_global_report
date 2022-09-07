@@ -36,6 +36,8 @@ publication. Zero-embargo access through non-publisher platforms for {{ report_n
 was {{ report_numbers.census_year.pc_other_platform_zero_embargo }}% of all outputs available through other platforms.
 Future reports will track the evolution of immediate other platform open access over time.
 
+<pdf:nextpage>
+
 # Open Access by Country
 
 The countries with the highest levels of open access continue to be countries will small publication output numbers, 
@@ -50,12 +52,18 @@ with high levels of accessibility.
 
 # Methodology
 
-This report was generated automatically from the source data and the relevant code and state of the repository
-is available at {{ git_status.remote_url }} with the commit hash {{ git_status.sha }} on branch {{ git_status.branch }}.
-
 The primary data table used was the final DOI table in the Academic Observatory for 
-{{ report_numbers.census_year.year }}, ###parameters.doi_table###. Open Access types and the means for
-detecting them are as described on the [COKI Open Access Dashboard](https://open.coki.ac/how/).
+{{ report_numbers.report_year }}, bigquery://academic-observatory.observatory.doi20211211. Open Access types and 
+the analysis for categorising them from Unpaywall are as described on the 
+[COKI Open Access Dashboard](https://open.coki.ac/how/).
+
+This report was generated automatically from the source data on {{ helper.created_at() }} and the relevant code and 
+state of the repository is available [on github]({{ git_status.remote_url }}):
+
+* Commit hash: `{{ git_status.sha }}`
+* Branch: `{{ git_status.branch }}`
+
+
 
 
 

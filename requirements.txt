@@ -10,3 +10,4 @@ notebook
 kaleido
 openpyxl
 gitpython
+pypdf2
