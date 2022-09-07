@@ -8,7 +8,7 @@
 <pdf:nexttemplate name="titlepage">
 <pdf:nextpage>
 
-<p class="subtitle">THE GLOBAL STATE OF OA {{ report_numbers.report_year }}</p>
+<p class="subtitle">THE GLOBAL STATE OF OPEN ACCESS {{ report_numbers.report_year }}</p>
 <p class="titlemeta"><br>REPORT DATE: {{ helper.created_at()|upper }}</p>
 <p class="titlemeta"><br>CENSUS PERIOD: {{ report_numbers.census_year.year }}</p>
 
@@ -22,21 +22,21 @@
 
 At the end of {{ report_numbers.report_year }} the global open access level for research published in 
 {{ report_numbers.census_year.year }} reached {{ report_numbers.census_year.pc_open }}% with an increase of 
-{{ report_numbers.census_year.pc_open_increase }}% to {{ report_numbers.census_year.pc_open }} compared to 
+{{ report_numbers.census_year.pc_open_increase }}% compared to 
 outputs published in {{ report_numbers.comparison_year.year }}. Access provided through publisher websites
-increased by {{ report_numbers.census_year.pc_publisher_open_increase }}% to 
+increased by {{ report_numbers.census_year.pc_publisher_increase }}% to 
 {{ report_numbers.census_year.pc_publisher }}% for {{ report_numbers.comparison_year.year }} publications.
 
 ![]({{ fig_oa_global_trend.files["oa_global_trend.png"].cache_filepath }})
 
-Access through other platforms has not grown to the same extent although embargoes appear to continue to 
-have a substantial depression on access through repositories for recent years of publication. As Unpaywall 
-commenced recording first availability dates in {{ report_numbers.comparison_year.year }} we cannot compare 
-the year on year change. Zero-embargo access through non-publisher platforms for {{ report_numbers.census_year.year }} 
-was {{ report_numbers.census_year.pc_other_platform_zero_embargo }}% of all outputs available through other platforms. 
+Access through other platforms was {{ report_numbers.census_year.pc_other_platform }}% in 
+{{ report_numbers.census_year.year }} with no growth compared to {{ report_numbers.comparison_year.year }} publications. 
+This may be the result of embargos depressing rates of access through repositories for the most recent years of 
+publication. Zero-embargo access through non-publisher platforms for {{ report_numbers.census_year.year }} 
+was {{ report_numbers.census_year.pc_other_platform_zero_embargo }}% of all outputs available through other platforms.
 Future reports will track the evolution of immediate other platform open access over time.
 
-# Leading Nations
+# Open Access by Country
 
 The countries with the highest levels of open access continue to be countries will small publication output numbers, 
 with Indonesia and Brazil dominating amongst countries with more than 10,000 outputs in 

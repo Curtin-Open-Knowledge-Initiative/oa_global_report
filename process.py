@@ -29,6 +29,7 @@ from precipy.analytics_function import AnalyticsFunction
 from parameters import *
 from report_data_processing.sql import *
 
+
 # Insert applicable graphs once created
 # from report_graphs import (
 #     Alluvial, OverallCoverage, BarLine, ValueAddBar, ValueAddByCrossrefType, ValueAddByCrossrefTypeHorizontal,
@@ -103,21 +104,26 @@ def report_numbers(af: AnalyticsFunction):
 
     for oa_type in OA_TYPES:
         for df in [oa_global, oa_country]:
-            df[f'pc_{oa_type}'] = np.round((df[oa_type] / df['total'] * 100), 0)
+            df[f'pc_{oa_type}'] = df[oa_type] / df['total'] * 100
 
-        oa_global[f'pc_{oa_type}_increase'] = oa_global[oa_type].diff(periods=-1)
+        oa_global[f'pc_{oa_type}_increase'] = oa_global[f'pc_{oa_type}'].diff(periods=-1)
 
+    # Testing
     census_year = dict(
         year=CENSUS_YEAR)
     census_year.update(
-        {f'pc_{oa_type}': oa_global[oa_global.year==CENSUS_YEAR][f'pc_{oa_type}'].values[0] for oa_type in OA_TYPES}
+        {f'pc_{oa_type}': int(
+            np.round(oa_global[oa_global.year == CENSUS_YEAR][f'pc_{oa_type}'].values[0], 0)) for oa_type in OA_TYPES}
     )
     census_year.update(
-        {f'pc_{oa_type}_increase': oa_global[oa_global.year==CENSUS_YEAR][f'pc_{oa_type}_increase'].values[0] for oa_type in OA_TYPES}
+        {f'pc_{oa_type}_increase': int(
+            np.round(oa_global[oa_global.year == CENSUS_YEAR][f'pc_{oa_type}_increase'].values[0], 0)) for oa_type in
+            OA_TYPES}
     )
 
-    zero_embargo_census_year = np.round(((zero_embargo[zero_embargo.year==CENSUS_YEAR]['count_zero_embargo'].values[0]/
-                                          oa_global[oa_global.year==CENSUS_YEAR]['other_platform'].values[0]) * 100), 0)
+    zero_embargo_census_year = int(
+        np.round(((zero_embargo[zero_embargo.year == CENSUS_YEAR]['count_zero_embargo'].values[0] /
+                   oa_global[oa_global.year == CENSUS_YEAR]['other_platform'].values[0]) * 100), 0))
     census_year.update(dict(pc_other_platform_zero_embargo=zero_embargo_census_year))
 
     report_numbers_dict = dict(
@@ -251,6 +257,7 @@ def fig_oa_country_compare(af: AnalyticsFunction):
     # create and save locally a figure displaying country OA summaries
     print('... start fig_oa_country_trend')
     df = pd.read_csv('tempdata/oa_country_trend.csv')
+    df.replace('United Kingdom of Great Britain and Northern Ireland', 'United Kingdom', inplace=True)
     df_agg = df.groupby(['name']).agg('sum')
     df_agg['total'] = df_agg.open + df_agg.closed
     df_agg['open_perc'] = df_agg.open / df_agg.total * 100

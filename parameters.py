@@ -20,9 +20,10 @@
 from pathlib import Path
 
 # which data year to run. The final year is *not* included so for eg 2010 to 2019 use (2010, 2020)
-YEARS = range(2010, 2022)
-REPORT_YEAR = 2020
-CENSUS_YEAR = 2019
+
+REPORT_YEAR = 2021
+CENSUS_YEAR = REPORT_YEAR -1
+YEARS = range(2010, REPORT_YEAR + 1 )
 
 # oa types
 OA_TYPES = [
@@ -41,7 +42,7 @@ C_LOCS = ['mean', 'median']
 RERUN = True
 VERBOSE = True
 PROJECT_ID = 'coki-scratch-space'
-DOI_TABLE = 'academic-observatory.observatory.doi20201212'
+DOI_TABLE = 'academic-observatory.observatory.doi20211211'
 UNPAYWALL_TABLE = 'academic-observatory.our_research.unpaywall'
 
 DESTINATION_TABLES = {
