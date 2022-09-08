@@ -9,7 +9,7 @@ render_file('config.json', [process], storages=[])
 
 reader = PdfReader('output_files/report_template.pdf')
 writer = PdfWriter()
-[writer.add_page(reader.pages[i]) for i in range(1, len(reader.pages))]
+[writer.add_page(reader.pages[i]) for i in range(0, len(reader.pages))]
 
 archive_dir = REPORT_ARCHIVES_DIR / str(REPORT_YEAR)
 if not os.path.isdir(archive_dir):
