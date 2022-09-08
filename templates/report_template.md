@@ -1,18 +1,13 @@
+
+
 {% import "report_macros.md" as helper with context %}
 {% include "report_css.html" %}
 
 {% set report_numbers = load_json(report_numbers.files["report_numbers.json"].cache_filepath) %}
 {% set git_status = load_json(git_status.files["git_status.json"].cache_filepath) %}
 
-<pdf:nextpage>
-
-# TT
-
 <!-- Title Page -->
-
 <pdf:nexttemplate name="titlepage">
-
-<pdf:nextpage>
 
 <p class="subtitle">THE GLOBAL STATE OF OPEN ACCESS {{ report_numbers.report_year }}</p>
 <p class="titlemeta"><br>REPORT DATE: {{ helper.created_at()|upper }}</p>
