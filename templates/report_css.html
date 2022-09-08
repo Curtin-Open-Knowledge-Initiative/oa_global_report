@@ -11,7 +11,7 @@
 
     @page titlepage {
         size: a4 portrait;
-        background-image: url("/Users/266883j/PycharmProjects/oa_global_report/coki_assets/title_image.png");
+        background-image: url("{{ file_assets.files["title_image.png"].cache_filepath }}");
         @frame title {
         left: 2cm;
         width: 16cm;
@@ -21,6 +21,7 @@
 
     @page report {
         size: a4 portrait;
+        background-image: url("{{ file_assets.files["blank_page.pdf"].cache_filepath }}");
         @frame content_frame {
         left: 2cm;
         width: 17cm;
@@ -39,7 +40,7 @@
 
         @page lastpage {
         size: a4 portrait;
-        background-image: url("../coki_assets/final_page.png");
+        background-image: url("{{ file_assets.files["final_page.png"].cache_filepath }}");
         @frame content_frame {
         left: 2cm;
         width: 17cm;

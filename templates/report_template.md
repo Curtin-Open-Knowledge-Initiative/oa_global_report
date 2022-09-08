@@ -4,8 +4,14 @@
 {% set report_numbers = load_json(report_numbers.files["report_numbers.json"].cache_filepath) %}
 {% set git_status = load_json(git_status.files["git_status.json"].cache_filepath) %}
 
+<pdf:nextpage>
+
+# TT
+
 <!-- Title Page -->
+
 <pdf:nexttemplate name="titlepage">
+
 <pdf:nextpage>
 
 <p class="subtitle">THE GLOBAL STATE OF OPEN ACCESS {{ report_numbers.report_year }}</p>
@@ -14,6 +20,7 @@
 
 
 <!-- switch page templates -->
+
 <pdf:nexttemplate name="report">
 
 <pdf:nextpage>
@@ -42,9 +49,10 @@ Future reports will track the evolution of immediate other platform open access 
 
 The countries with the highest levels of open access continue to be countries will small publication output numbers, 
 with Indonesia and Brazil dominating amongst countries with more than 10,000 outputs in 
-{{ report_numbers.census_year.year }}. A set of European countries, along with South Africa and Mexico follow. 
+{{ report_numbers.census_year.year }} with a set of European countries following. 
 European countries tend to show higher levels of open access through other platforms, compared to other countries
-with high levels of accessibility.
+with high levels of accessibility and this is in part due to generally shorter embargos, particularly in north-western
+Europe.
 
 ![]({{ fig_oa_country_compare.files["oa_country_compare.png"].cache_filepath }})
 
@@ -63,7 +71,7 @@ state of the repository is available [on github]({{ git_status.remote_url }}):
 * Commit hash: `{{ git_status.sha }}`
 * Branch: `{{ git_status.branch }}`
 
-
-
+<pdf:nexttemplate name="lastpage">
+<pdf:nextpage>
 
 

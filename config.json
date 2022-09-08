@@ -45,6 +45,10 @@
     [
       "git_status",
       {}
+    ],
+    [
+      "file_assets",
+      {}
     ]
   ],
   "templates": [

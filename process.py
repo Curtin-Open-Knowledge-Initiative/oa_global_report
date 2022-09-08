@@ -415,3 +415,13 @@ def git_status(af: AnalyticsFunction):
             remote_url=';'.join(remote.url for remote in repo.remotes)),
             f
         )
+
+
+def file_assets(af: AnalyticsFunction):
+    """
+    Add key file assets to the Precipy File Records
+    """
+
+    af.add_existing_file('coki_assets/title_image.png')
+    af.add_existing_file('coki_assets/blank_page.pdf')
+    af.add_existing_file('coki_assets/final_page.png')
