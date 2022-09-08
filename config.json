@@ -3,10 +3,7 @@
   "output_bucket_name": "output_files",
   "logfile": "logs/precipy.log",
   "loglevel": "DEBUG",
-  "constants": {
-    "PROJECT_ID": "utrecht-university",
-    "YEAR_RANGE": [1980,2026]
-  },
+  "constants": {},
   "ranges": {
   },
   "analytics": [
