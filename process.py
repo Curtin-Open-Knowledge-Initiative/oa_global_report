@@ -399,6 +399,7 @@ def git_status(af: AnalyticsFunction):
     Record Git Status for Current State of the Repo
     """
 
+    # Force git_status to run
     repo = Repo(search_parent_directories=True)
     print('This report was run from the git commit hash: ' + repo.head.object.hexsha)
     changedfiles = [item.a_path for item in repo.index.diff(None)]
