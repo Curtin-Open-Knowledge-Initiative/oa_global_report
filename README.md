@@ -3,7 +3,7 @@
 This repository provides the code and framework for creating the COKI annual Global State of Open Access reports.
 The final reports for each year, starting from 2021 are available at Zenodo as follows:
 
-* 2021 Report: https://doi.org/####
+* 2021 Report: https://doi.org/10.5281/zenodo.7059176
 
 The reporting framework uses an automated documentation engine to pull data from the academic observatory data
 system to generate a summary report, which is then modified for each release. Our goal is to release an annual
